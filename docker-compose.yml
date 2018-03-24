@@ -1,0 +1,75 @@
+version: '3'
+
+services:
+  redis:
+    restart: always
+    container_name: redis
+    hostname: 'redis'
+    image: redis:4.0-alpine
+    command:
+      - --loglevel warning
+    volumes:
+      - /srv/gitlab/redis:/var/lib/redis:Z
+
+  postgresql:
+    restart: always
+    container_name: postgresql
+    hostname: 'postgresql'
+    image: postgres:10.3-alpine
+    volumes:
+      - /srv/gitlab/postgresql/data:/var/lib/postgresql/data:rw
+    environment:
+      - POSTGRES_USER=gitlab
+      - POSTGRES_PASSWORD=f882f8216395734e3621da9cd7119d64
+      - POSTGRES_DB=gitlabhq_production
+
+  gitlab:
+    restart: always
+    container_name: gitlab
+    image: gitlab/gitlab-ce:10.5.5-ce.0
+    hostname: 'git.cloud.lab'
+    depends_on:
+      - redis
+      - postgresql
+    ports:
+      - "10080:10080"
+      - "10022:22"
+    volumes:
+      - /srv/gitlab/logs:/var/log/gitlab:rw
+      - /srv/gitlab/data:/var/opt/gitlab:rw
+      - /srv/gitlab/config:/etc/gitlab:rw
+      - /srv/gitlab/backups:/mnt/backups:rw
+    environment:
+      GITLAB_OMNIBUS_CONFIG: |
+        external_url 'http://git.cloud.lab:10080'
+        gitlab_rails['gitlab_https'] = false
+        gitlab_rails['gitlab_shell_ssh_port'] = 10022
+        postgresql['enable'] = false
+        gitlab_rails['db_username'] = 'gitlab'
+        gitlab_rails['db_host'] = 'postgresql'
+        gitlab_rails['db_adapter'] = 'postgresql'
+        gitlab_rails['db_port'] = 5432
+        gitlab_rails['db_database'] = 'gitlabhq_production'
+        gitlab_rails['db_encoding'] = 'utf8'
+        gitlab_rails['db_password'] = 'f882f8216395734e3621da9cd7119d64'
+        redis['enable'] = false
+        gitlab_rails['redis_host'] = 'redis'
+        gitlab_rails['redis_port'] = 6379
+        gitlab_rails['timezone'] = 'Asia/Ho_Chi_Minh'
+        gitlab_rails['initial_root_password'] = 'f882f8216395734e3621da9cd7119d64'
+        gitlab_rails['backup_upload_connection'] = "{:provider => 'Local', :local_root => '/mnt/backups'}"
+        gitlab_rails['backup_upload_remote_directory'] = 'gitlab_backups'
+        gitlab_monitor['enable'] = false
+        unicorn['worker_processes'] = 3
+        unicorn['worker_timeout'] = 60
+
+  jenkins:
+    restart: always
+    container_name: jenkins
+    image: jenkinsci/blueocean:1.4.2
+    user: root
+    ports:
+      - "49001:8080"
+    volumes:
+        - /srv/jenkins_home:/var/jenkins_home
+        - /var/run/docker.sock:/var/run/docker.sock
