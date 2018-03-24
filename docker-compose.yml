@@ -41,10 +41,10 @@ services:
       - /srv/gitlab/config:/etc/gitlab:rw
       - /srv/gitlab/backups:/mnt/backups:rw
     environment:
-      http_proxy: "http://10.61.2.237:3128"
-      https_proxy: "https://10.61.2.237:3128"
-      HTTP_PROXY: "http://10.61.2.237:3128"
-      HTTPS_PROXY: "https://10.61.2.237:3128"
+      http_proxy: "http://proxy_host:port"
+      https_proxy: "https://proxy_host:port"
+      HTTP_PROXY: "http://proxy_host:port"
+      HTTPS_PROXY: "https://proxy_host:port"
       GITLAB_OMNIBUS_CONFIG: |
         external_url 'http://git.cloud.lab:10080'
         gitlab_rails['gitlab_https'] = false
