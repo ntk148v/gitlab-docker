@@ -82,6 +82,11 @@ services:
     container_name: jenkins
     image: jenkinsci/blueocean:1.4.2
     user: root
+    # environment:
+      # http_proxy: "http://proxy_host:port"
+      # https_proxy: "https://proxy_host:port"
+      # HTTP_PROXY: "http://proxy_host:port"
+      # HTTPS_PROXY: "https://proxy_host:port"
     ports:
       - "49001:8080"
     volumes:
