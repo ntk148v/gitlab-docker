@@ -62,7 +62,8 @@ services:
         gitlab_rails['redis_port'] = 6379
         gitlab_rails['timezone'] = 'Asia/Ho_Chi_Minh'
         gitlab_rails['initial_root_password'] = 'f882f8216395734e3621da9cd7119d64'
-        gitlab_rails['backup_upload_connection'] = "{:provider => 'Local', :local_root => '/mnt/backups'}"
+        gitlab_rails['env'] = { :http_proxy => 'http://proxy_host:port', :https_proxy => 'https://proxy_host:port' }
+        gitlab_rails['backup_upload_connection'] = {:provider => 'Local', :local_root => '/mnt/backups'}
         gitlab_rails['backup_upload_remote_directory'] = 'gitlab_backups'
         # gitlab_rails['smtp_enable'] = true
         # gitlab_rails['smtp_address'] = 'smtp.server'
